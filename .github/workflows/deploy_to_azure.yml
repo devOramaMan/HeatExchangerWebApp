@@ -35,12 +35,12 @@ jobs:
       run: dotnet test --no-build --verbosity normal
 
     - name: Publish
-    - run: dotnet publish -c Release -o '${{ env.AZURE_HEATEXCHANGER_WEBAPP_PATH }}/myapp'
+      run: dotnet publish -c Release -o '${{ env.AZURE_HEATEXCHANGER_WEBAPP_PATH }}/myapp'
 
     - name: Deploy
       uses: Azure/webapps-deploy@v2.2.17
       with:
-        app-name: ${{ AZURE_HEATEXCHANGER_WEBAPP_NAME }}
+        app-name: ${{ env.AZURE_HEATEXCHANGER_WEBAPP_NAME }}
         slot-name: 'development'
         publish-profile: ${{ secrets.AZURE_HEATEXCHANGER_WEBAPP }}
         package: '${{ env.AZURE_HEATEXCHANGER_WEBAPP_PATH }}/myapp'
