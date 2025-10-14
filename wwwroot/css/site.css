@@ -18,7 +18,10 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -28,4 +31,536 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* Ventilasjonsmonitor styling */
+.ventilation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.house-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.house {
+  position: relative;
+  width: 600px;
+  height: 400px;
+  margin-bottom: 20px;
+}
+
+.roof {
+  width: 0;
+  height: 0;
+  border-left: 340px solid transparent;
+  border-right: 340px solid transparent;
+  border-bottom: 180px solid #ffecb3;
+  position: absolute;
+  top: -40px;
+  left: -40px;
+  z-index: 5;
+}
+
+.house-body {
+  width: 600px;
+  height: 300px;
+  background: linear-gradient(135deg, #ffecb3 0%, #ffecb3 100%);
+  border: 3px solid #5d4037;
+  border-left: #1a1a1a;
+  border-right: #1a1a1a;
+  border-bottom: #1a1a1a;
+  position: absolute;
+  top: 120px;
+  z-index: 1;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.ventilation-unit {
+  position: absolute;
+  top: 25px;
+  left: 50px;
+  width: 500px;
+  height: 242px;
+  background: linear-gradient(135deg, #263238 0%, #37474f 100%);
+  border: 2px solid #1a1a1a;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.ventilation-header {
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 15px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+.chambers-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 15px;
+  height: 120px;
+  position: relative;
+}
+
+.chamber {
+  background: linear-gradient(135deg, #546e7a 0%, #607d8b 100%);
+  border: 2px solid #37474f;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+/* Central Heat Exchanger Core */
+.heat-exchanger-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 95px;
+  height: 95px;
+  /* Default (halted) - Gray linear background */
+  background: 
+    /* Grid pattern */
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    /* Gray radial gradient for halted state */
+    radial-gradient(circle, 
+      rgba(120, 120, 120, 0.8) 0%, 
+      rgba(90, 90, 90, 0.7) 30%, 
+      rgba(70, 70, 70, 0.6) 60%, 
+      rgba(50, 50, 50, 0.8) 100%
+    ),
+    /* Base metallic color */
+    linear-gradient(45deg, #37474f 0%, #546e7a 100%);
+  border: 3px solid #666666;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 4px 12px rgba(0,0,0,0.3),
+    inset 0 2px 4px rgba(255,255,255,0.1),
+    inset 0 -2px 4px rgba(0,0,0,0.3);
+  z-index: 10;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  /* Rotation animation - controlled by JavaScript */
+  animation: none;
+}
+
+/* Rotation states */
+.heat-exchanger-core.rotating {
+  /* Active (rotating) - Colorful heat background */
+  background: 
+    /* Grid pattern */
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    /* Colorful radial overlay for active state */
+    radial-gradient(circle, 
+      rgba(255, 107, 53, 0.9) 0%, 
+      rgba(247, 147, 30, 0.8) 30%, 
+      rgba(255, 204, 2, 0.7) 60%, 
+      rgba(255, 107, 53, 0.9) 100%
+    ),
+    /* Base metallic color */
+    linear-gradient(45deg, #37474f 0%, #546e7a 100%);
+  border-color: #d84315;
+  box-shadow: 
+    0 4px 12px rgba(0,0,0,0.3),
+    inset 0 2px 4px rgba(255,255,255,0.2),
+    inset 0 -2px 4px rgba(0,0,0,0.2);
+  animation: coreRotation var(--rotation-duration, 2s) linear infinite;
+}
+
+.heat-exchanger-core:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 
+    0 6px 16px rgba(0,0,0,0.4),
+    inset 0 2px 4px rgba(255,255,255,0.3),
+    inset 0 -2px 4px rgba(0,0,0,0.3);
+}
+
+.heat-exchanger-core.rotating:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.core-inner {
+  text-align: center;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  transition: all 0.3s ease;
+}
+
+.heat-exchanger-core:not(.rotating) .core-inner {
+  color: #cccccc;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+}
+
+.heat-exchanger-core.rotating .core-inner {
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+}
+
+.core-label {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.core-sublabel {
+  font-size: 10px;
+  font-weight: normal;
+  opacity: 0.9;
+}
+
+/* Core rotation animation */
+@keyframes coreRotation {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Heat pulse animation (optional overlay) */
+@keyframes heatPulse {
+  0%, 100% {
+    box-shadow: 
+      0 4px 12px rgba(0,0,0,0.3),
+      inset 0 2px 4px rgba(255,255,255,0.2),
+      inset 0 -2px 4px rgba(0,0,0,0.2),
+      0 0 0 0 rgba(255, 107, 53, 0);
+  }
+  50% {
+    box-shadow: 
+      0 4px 12px rgba(0,0,0,0.3),
+      inset 0 2px 4px rgba(255,255,255,0.3),
+      inset 0 -2px 4px rgba(0,0,0,0.1),
+      0 0 0 8px rgba(255, 107, 53, 0.3);
+  }
+}
+
+.chamber:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.chamber-label {
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+.temperature-display {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.temp-value {
+  display: inline-block;
+  min-width: 45px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.temp-value:hover {
+  background: white;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.temp-unit {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+.air-flows {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 200px;
+}
+
+.air-inlet, .air-outlet {
+  padding: 8px 16px;
+  background: rgba(33, 150, 243, 0.8);
+  color: white;
+  font-weight: bold;
+  border-radius: 20px;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.air-outlet {
+  background: rgba(255, 87, 34, 0.8);
+}
+
+/* Core Controls */
+.core-controls {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 20px;
+  border-radius: 15px;
+  margin: 20px 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border: 2px solid #dee2e6;
+}
+
+.core-controls h4 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.control-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  color: #495057;
+  cursor: pointer;
+}
+
+.control-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.rpm-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.rpm-control label {
+  font-weight: bold;
+  color: #495057;
+}
+
+#rpmSlider {
+  width: 200px;
+  height: 6px;
+  background: #dee2e6;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+#rpmSlider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+#rpmSlider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.efficiency-display {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border: 2px solid #bdbdbd;
+  margin-top: 20px;
+}
+
+.efficiency-display h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.efficiency-value {
+  font-size: 36px;
+  font-weight: bold;
+  color: #2e7d32;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.efficiency-formula {
+  color: #666;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.chart-container {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+  border: 1px solid #e0e0e0;
+}
+
+.chart-container h3 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.terminology {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: left;
+  border: 1px solid #e0e0e0;
+}
+
+.terminology h4 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.ventilation-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .house {
+    width: 100%;
+    max-width: 500px;
+    height: 350px;
+  }
+  
+  .roof {
+    border-left-width: 290px;
+    border-right-width: 290px;
+    border-bottom-width: 150px;
+    top: -15px;
+    left: -40px;
+  }
+  
+  .house-body {
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .ventilation-unit {
+    width: 90%;
+    left: 5%;
+  }
+  
+  .chambers-container {
+    gap: 10px;
+  }
+  
+  .chamber-label {
+    font-size: 11px;
+  }
+  
+  .temp-value {
+    min-width: 40px;
+    font-size: 14px;
+    padding: 4px 8px;
+  }
+  
+  .heat-exchanger-core {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .core-label {
+    font-size: 14px;
+  }
+  
+  .core-sublabel {
+    font-size: 8px;
+  }
+  
+  .control-group {
+    gap: 10px;
+  }
+  
+  #rpmSlider {
+    width: 150px;
+  }
+  
+  .core-controls {
+    padding: 15px;
+  }
 }
