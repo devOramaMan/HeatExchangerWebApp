@@ -57,12 +57,12 @@ body {
 .roof {
   width: 0;
   height: 0;
-  border-left: 340px solid transparent;
-  border-right: 340px solid transparent;
-  border-bottom: 180px solid #ffecb3;
+  border-left: 300px solid transparent;
+  border-right: 300px solid transparent;
+  border-bottom: 150px solid #ffecb3;
   position: absolute;
-  top: -40px;
-  left: -40px;
+  top: -30px;
+  left: 0;
   z-index: 5;
 }
 
@@ -70,14 +70,10 @@ body {
   width: 600px;
   height: 300px;
   background: linear-gradient(135deg, #ffecb3 0%, #ffecb3 100%);
-  border: 3px solid #5d4037;
-  border-left: #1a1a1a;
-  border-right: #1a1a1a;
-  border-bottom: #1a1a1a;
+  border: none;
   position: absolute;
   top: 120px;
   z-index: 1;
-  border-radius: 0 0 10px 10px;
   box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
 
@@ -438,7 +434,8 @@ body {
   text-align: center;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   border: 2px solid #bdbdbd;
-  margin-top: 20px;
+  margin: 20px auto;
+  max-width: 250px;
 }
 
 .efficiency-display h3 {
@@ -468,6 +465,7 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin-bottom: 30px;
   border: 1px solid #e0e0e0;
+  min-height: 350px;
 }
 
 .chart-container h3 {
@@ -501,18 +499,24 @@ body {
 
 /* Responsive design */
 @media (max-width: 768px) {
+  .house-diagram {
+    margin-bottom: 60px;
+  }
+  
   .house {
     width: 100%;
     max-width: 500px;
-    height: 350px;
+    height: 420px;
   }
   
   .roof {
-    border-left-width: 290px;
-    border-right-width: 290px;
-    border-bottom-width: 150px;
-    top: -15px;
-    left: -40px;
+    width: 100%;
+    height: 120px;
+    background: #ffecb3;
+    top: 0px;
+    left: 0;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    border: none;
   }
   
   .house-body {
@@ -562,5 +566,24 @@ body {
   
   .core-controls {
     padding: 15px;
+  }
+  
+  .efficiency-display {
+    margin-top: 40px;
+  }
+  
+  .chart-container {
+    padding: 20px;
+    min-height: 300px;
+  }
+  
+  .chart-container h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  #efficiencyChart {
+    min-height: 250px !important;
+    height: 250px !important;
   }
 }

@@ -74,7 +74,6 @@
 
     <!-- Efficiency chart -->
     <div class="chart-container">
-        <h3>Efficiency over time</h3>
         <canvas id="efficiencyChart" width="800" height="300"></canvas>
     </div>
 
@@ -171,6 +170,7 @@
             data: chartData,
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -189,7 +189,7 @@
                 },
                 plugins: {
                     title: {
-                        display: true,
+                        display: false,
                         text: 'Heat Exchanger Efficiency'
                     }
                 }
