@@ -19,17 +19,12 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-dotnettools.csharp",
-        "ms-dotnettools.csdevkit",
-        "ms-dotnettools.vscodeintellicode-csharp",
         "ms-vscode.vscode-json",
         "bradlc.vscode-tailwindcss",
         "ms-vscode.azure-account",
         "ms-azuretools.vscode-docker"
       ],
       "settings": {
-        "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
-        "dotnet.server.useOmnisharp": false,
         "terminal.integrated.defaultProfile.linux": "bash"
       }
     }
