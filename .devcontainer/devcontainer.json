@@ -29,7 +29,8 @@
       ],
       "settings": {
         "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
-        "dotnet.server.useOmnisharp": false
+        "dotnet.server.useOmnisharp": false,
+        "terminal.integrated.defaultProfile.linux": "bash"
       }
     }
   },
