@@ -10,6 +10,7 @@
       "version": "9.0",
       "installUsingApt": false
     },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
@@ -35,11 +36,11 @@
 
   // Environment variables for the development container
   "containerEnv": {
-    "PG_DB_HOST": "${localEnv:PG_DB_HOST}",
-    "PG_DB_PORT": "${localEnv:PG_DB_PORT}", 
-    "PG_DB_NAME": "${localEnv:PG_DB_NAME}",
-    "PG_DB_USER": "${localEnv:PG_DB_USER}",
-    "PG_DB_PASSWORD": "${localEnv:PG_DB_PASSWORD}",
+    "PG_DB_HOST": "postgres",
+    "PG_DB_PORT": "5432", 
+    "PG_DB_NAME": "heatexchanger_db",
+    "PG_DB_USER": "postgres",
+    "PG_DB_PASSWORD": "dev_password_123",
     "ASPNETCORE_ENVIRONMENT": "Development"
   },
 

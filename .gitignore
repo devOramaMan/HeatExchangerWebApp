@@ -369,3 +369,4 @@ FodyWeavers.xsd
 .devcontainer/README.md
 .devcontainer/CODESPACES-GUIDE.md
 .devcontainer/.env.example
+REBUILD_GUIDE.md

@@ -11,11 +11,11 @@ services:
     networks:
       - dev-network
     environment:
-      - PG_DB_HOST=${PG_DB_HOST}
-      - PG_DB_PORT=${PG_DB_PORT}
-      - PG_DB_NAME=${PG_DB_NAME}
-      - PG_DB_USER=${PG_DB_USER}
-      - PG_DB_PASSWORD=${PG_DB_PASSWORD}
+      - PG_DB_HOST=postgres
+      - PG_DB_PORT=5432
+      - PG_DB_NAME=heatexchanger_db
+      - PG_DB_USER=postgres
+      - PG_DB_PASSWORD=dev_password_123
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       postgres:
@@ -29,9 +29,10 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d
     environment:
-      - POSTGRES_USER=${PG_DB_USER}
-      - POSTGRES_PASSWORD=${PG_DB_PASSWORD}
-      - POSTGRES_DB=${PG_DB_NAME}
+      environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=dev_password_123
+      - POSTGRES_DB=heatexchanger_db
       - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
     ports:
       - "5432:5432"
@@ -40,7 +41,7 @@ services:
         aliases:
           - PG_HExM
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PG_DB_USER} -d ${PG_DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d heatexchanger_db"]
       interval: 10s
       timeout: 5s
       retries: 5
