@@ -29,7 +29,6 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d
     environment:
-      environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=dev_password_123
       - POSTGRES_DB=heatexchanger_db
