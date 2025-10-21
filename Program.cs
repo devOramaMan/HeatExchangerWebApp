@@ -1,7 +1,15 @@
+using HeatExchangerWebApp.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// Add API controllers
+builder.Services.AddControllers();
+
+// Register database connection service
+builder.Services.AddSingleton<DatabaseConnectionService>();
 
 var app = builder.Build();
 
@@ -18,6 +26,9 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
+
+// Map API controllers
+app.MapControllers();
 
 app.MapStaticAssets();
 app.MapRazorPages()

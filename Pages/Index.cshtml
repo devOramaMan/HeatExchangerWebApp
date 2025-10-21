@@ -77,6 +77,15 @@
         <canvas id="efficiencyChart" width="800" height="300"></canvas>
     </div>
 
+    <!-- Database Status -->
+    <div class="database-status">
+        <h4>Database Connection Status</h4>
+        <div id="dbStatus" class="status-indicator">Checking...</div>
+        <button onclick="testDatabaseConnection()" class="btn btn-primary">Test Connection</button>
+        <button onclick="insertTestData()" class="btn btn-success">Insert Test Data</button>
+        <button onclick="getLatestReadings()" class="btn btn-info">Get Latest Readings</button>
+    </div>
+
     <!-- Terminology -->
     <div class="terminology">
         <h4>Heat Exchanger Terminology</h4>
@@ -249,5 +258,92 @@
             fetchTemperatureData();
             updateEfficiency();
         }, 3000);
+
+        // Database testing functions
+        async function testDatabaseConnection() {
+            const statusElement = document.getElementById('dbStatus');
+            statusElement.textContent = 'Testing connection...';
+            statusElement.className = 'status-indicator testing';
+            
+            try {
+                const response = await fetch('/api/DatabaseTest/test-connection');
+                const result = await response.json();
+                
+                if (response.ok) {
+                    statusElement.textContent = `Connected - ${result.DatabaseInfo?.Database || 'Unknown DB'}`;
+                    statusElement.className = 'status-indicator success';
+                    console.log('Database Info:', result);
+                } else {
+                    statusElement.textContent = `Failed - ${result.Message}`;
+                    statusElement.className = 'status-indicator error';
+                    console.error('Connection failed:', result);
+                }
+            } catch (error) {
+                statusElement.textContent = `Error - ${error.message}`;
+                statusElement.className = 'status-indicator error';
+                console.error('Network error:', error);
+            }
+        }
+
+        async function insertTestData() {
+            const testData = {
+                TemperatureInlet: currentData.temp1,
+                TemperatureOutlet: currentData.temp2,
+                PressureInlet: 2.1,
+                PressureOutlet: 1.8,
+                FlowRate: 150.0,
+                Efficiency: calculateEfficiency()
+            };
+
+            try {
+                const response = await fetch('/api/DatabaseTest/insert-test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`Data inserted successfully! ID: ${result.Result?.Id}`);
+                    console.log('Inserted data:', result);
+                } else {
+                    alert(`Insert failed: ${result.Message}`);
+                    console.error('Insert failed:', result);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                console.error('Network error:', error);
+            }
+        }
+
+        async function getLatestReadings() {
+            try {
+                const response = await fetch('/api/DatabaseTest/readings');
+                const result = await response.json();
+                
+                if (response.ok) {
+                    console.log('Latest readings:', result.Readings);
+                    
+                    // Display in a simple format
+                    const readingsText = result.Readings.map(r => 
+                        `${new Date(r.Timestamp).toLocaleString()}: ${r.Efficiency}% efficiency`
+                    ).join('\\n');
+                    
+                    alert(`Latest ${result.Count} readings:\\n\\n${readingsText}`);
+                } else {
+                    alert(`Failed to get readings: ${result.Message}`);
+                    console.error('Get readings failed:', result);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+                console.error('Network error:', error);
+            }
+        }
+
+        // Test database connection on page load
+        setTimeout(testDatabaseConnection, 1000);
     </script>
 }
