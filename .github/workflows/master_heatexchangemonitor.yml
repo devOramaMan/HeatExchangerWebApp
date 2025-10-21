@@ -41,6 +41,12 @@ jobs:
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
+    env:
+      PG_DB_HOST: ${{ secrets.PG_DB_HOST }}
+      PG_DB_PORT: ${{ secrets.PG_DB_PORT }}
+      PG_DB_NAME: ${{ secrets.PG_DB_NAME }}
+      PG_DB_USER: ${{ secrets.PG_DB_USER }}
+      PG_DB_PASSWORD: ${{ secrets.PG_DB_PASSWORD }}
 
     steps:
       - name: Download artifact from build job

@@ -1,0 +1,68 @@
+{
+  "name": "Heat Exchanger Web App with PostgreSQL",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  
+  // Features to add to the dev container. More info: https://containers.dev/features
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:2": {
+      "version": "9.0",
+      "installUsingApt": false
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  // Configure tool-specific properties
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.vscodeintellicode-csharp",
+        "ms-vscode.vscode-json",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.azure-account",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+        "dotnet.server.useOmnisharp": false
+      }
+    }
+  },
+
+  // Environment variables for the development container
+  "containerEnv": {
+    "PG_DB_HOST": "${localEnv:PG_DB_HOST}",
+    "PG_DB_PORT": "${localEnv:PG_DB_PORT}", 
+    "PG_DB_NAME": "${localEnv:PG_DB_NAME}",
+    "PG_DB_USER": "${localEnv:PG_DB_USER}",
+    "PG_DB_PASSWORD": "${localEnv:PG_DB_PASSWORD}",
+    "ASPNETCORE_ENVIRONMENT": "Development"
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally
+  "forwardPorts": [
+    5432   // PostgreSQL Database Port (from PG_DB_PORT env var)
+  ],
+
+  // Port attributes for better Codespaces experience
+  "portsAttributes": {
+    "5432": {
+      "label": "PostgreSQL Database", 
+      "onAutoForward": "silent",
+      "visibility": "public"
+    }
+  },
+
+  // Use 'postCreateCommand' to run commands after the container is created
+  "postCreateCommand": "dotnet restore",
+
+  // Use 'postStartCommand' to run commands after the container starts
+  "postStartCommand": "echo 'Development environment ready!'",
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root
+  "remoteUser": "vscode"
+}

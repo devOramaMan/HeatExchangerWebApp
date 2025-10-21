@@ -361,3 +361,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# DevContainer environment files with credentials
+.devcontainer/.env
+.devcontainer/**/.env
+*.env
+.devcontainer/README.md
+.devcontainer/CODESPACES-GUIDE.md
+.devcontainer/.env.example
