@@ -55,7 +55,7 @@
   },
 
   // Use 'postCreateCommand' to run commands after the container is created
-  "postCreateCommand": "dotnet restore",
+  //"postCreateCommand": "dotnet restore",
 
   // Use 'postStartCommand' to run commands after the container starts
   "postStartCommand": "echo 'Development environment ready!'",
