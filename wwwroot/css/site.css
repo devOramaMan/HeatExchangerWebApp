@@ -656,3 +656,15 @@ body {
 .btn-primary:hover, .btn-success:hover, .btn-info:hover {
   opacity: 0.8;
 }
+
+/* Data Source Status */
+.data-source-status {
+  padding: 8px 12px;
+  margin-top: 10px;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  font-weight: bold;
+  color: #666;
+  text-align: center;
+}

@@ -72,6 +72,18 @@
         </div>
     </div>
 
+    <!-- Data Source Toggle -->
+    <div class="core-controls">
+        <h4>Data Source</h4>
+        <div class="control-group">
+            <label class="control-label">
+                <input type="checkbox" id="dataSourceToggle" />
+                Use Database (simulator writes to DB)
+            </label>
+            <div id="dataSourceStatus" class="data-source-status">Mode: Simulator Only</div>
+        </div>
+    </div>
+
     <!-- Efficiency chart -->
     <div class="chart-container">
         <canvas id="efficiencyChart" width="800" height="300"></canvas>
@@ -102,6 +114,22 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Data source mode
+        let useDatabaseMode = false;
+        const dataSourceToggle = document.getElementById('dataSourceToggle');
+        const dataSourceStatus = document.getElementById('dataSourceStatus');
+
+        dataSourceToggle.addEventListener('change', () => {
+            useDatabaseMode = dataSourceToggle.checked;
+            if (useDatabaseMode) {
+                dataSourceStatus.textContent = 'Mode: Database (Simulator → DB → UI)';
+                dataSourceStatus.style.color = '#2e7d32';
+            } else {
+                dataSourceStatus.textContent = 'Mode: Simulator Only';
+                dataSourceStatus.style.color = '#666';
+            }
+        });
+
         // Efficiency calculation
         function calculateEfficiency() {
             const t1 = currentData.temp1; // T1: Outdoor Air In (Chamber 4)
@@ -134,8 +162,40 @@
         };
 
         // Simulates fetching data from API/database
-        function fetchTemperatureData() {
-            // Hardcoded values with some variation to simulate live data
+        async function fetchTemperatureData() {
+            if (useDatabaseMode) {
+                // Database mode: Write simulated data to DB, then read from DB
+                const writeSuccess = await writeSimulatedDataToDB();
+                if (writeSuccess) {
+                    // Small delay to ensure DB commit completes
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                    await readDataFromDB();
+                } else {
+                    console.warn('Skipping read due to write failure');
+                }
+            } else {
+                // Simulator mode: Generate and display data directly
+                const baseValues = {
+                    temp1: 5.0,
+                    temp2: 18.0,
+                    temp3: 20.0,
+                    temp4: 8.0
+                };
+
+                // Add some random variation (±2 degrees)
+                currentData.temp1 = baseValues.temp1 + (Math.random() - 0.5) * 4;
+                currentData.temp2 = baseValues.temp2 + (Math.random() - 0.5) * 4;
+                currentData.temp3 = baseValues.temp3 + (Math.random() - 0.5) * 4;
+                currentData.temp4 = baseValues.temp4 + (Math.random() - 0.5) * 4;
+
+                // Update display
+                updateTemperatureDisplay();
+                updateEfficiency();
+            }
+        }
+
+        async function writeSimulatedDataToDB() {
+            // Generate simulated data
             const baseValues = {
                 temp1: 5.0,
                 temp2: 18.0,
@@ -143,14 +203,74 @@
                 temp4: 8.0
             };
 
-            // Add some random variation (±2 degrees)
-            currentData.temp1 = baseValues.temp1 + (Math.random() - 0.5) * 4;
-            currentData.temp2 = baseValues.temp2 + (Math.random() - 0.5) * 4;
-            currentData.temp3 = baseValues.temp3 + (Math.random() - 0.5) * 4;
-            currentData.temp4 = baseValues.temp4 + (Math.random() - 0.5) * 4;
+            const simulatedData = {
+                temp1: baseValues.temp1 + (Math.random() - 0.5) * 4,
+                temp2: baseValues.temp2 + (Math.random() - 0.5) * 4,
+                temp3: baseValues.temp3 + (Math.random() - 0.5) * 4,
+                temp4: baseValues.temp4 + (Math.random() - 0.5) * 4
+            };
 
-            // Update display
-            updateTemperatureDisplay();
+            const testData = {
+                T1_Outdoor_Air_In_Temperature: simulatedData.temp1,
+                T2_Supply_Air_Temperature: simulatedData.temp2,
+                T3_Extract_Air_Temperature: simulatedData.temp3,
+                T4_Exhaust_Air_Out_Temperature: simulatedData.temp4
+            };
+
+            try {
+                const response = await fetch('/api/DatabaseTest/insert-test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Failed to write to database:', errorText);
+                    return false;
+                }
+                
+                const result = await response.json();
+                console.log('Successfully wrote to database:', result.Result?.Id);
+                return true;
+            } catch (error) {
+                console.error('Failed to write to database:', error);
+                return false;
+            }
+        }
+
+        async function readDataFromDB() {
+            try {
+                console.log('Fetching readings from /api/DatabaseTest/readings...');
+                const response = await fetch('/api/DatabaseTest/readings');
+                console.log('Response status:', response.status, response.statusText);
+                
+                const result = await response.json();
+                console.log('Response data:', result);
+                
+                if (response.ok && result.readings && result.readings.length > 0) {
+                    const latest = result.readings[0];
+                    console.log('Latest reading:', latest);
+                    
+                    currentData.temp1 = parseFloat(latest.t1_Outdoor_Air_In_Temperature);
+                    currentData.temp2 = parseFloat(latest.t2_Supply_Air_Temperature);
+                    currentData.temp3 = parseFloat(latest.t3_Extract_Air_Temperature);
+                    currentData.temp4 = parseFloat(latest.t4_Exhaust_Air_Out_Temperature);
+                    
+                    console.log('Updated currentData:', currentData);
+                    
+                    updateTemperatureDisplay();
+                    updateEfficiency();
+                    console.info('✓ Successfully read data from database');
+                }
+                else{
+                    console.warn('No readings available from database. Response OK:', response.ok, 'Readings:', result.readings);
+                }
+            } catch (error) {
+                console.error('Failed to read from database:', error);
+            }
         }
 
         function updateTemperatureDisplay() {
@@ -251,12 +371,10 @@
 
         // Initial data load
         fetchTemperatureData();
-        updateEfficiency();
         
         // Simulate data fetching every 3 seconds (as if coming from sensors/API)
         setInterval(() => {
             fetchTemperatureData();
-            updateEfficiency();
         }, 3000);
 
         // Database testing functions
@@ -287,12 +405,10 @@
 
         async function insertTestData() {
             const testData = {
-                TemperatureInlet: currentData.temp1,
-                TemperatureOutlet: currentData.temp2,
-                PressureInlet: 2.1,
-                PressureOutlet: 1.8,
-                FlowRate: 150.0,
-                Efficiency: calculateEfficiency()
+                T1_Outdoor_Air_In_Temperature: currentData.temp1,
+                T2_Supply_Air_Temperature: currentData.temp2,
+                T3_Extract_Air_Temperature: currentData.temp3,
+                T4_Exhaust_Air_Out_Temperature: currentData.temp4
             };
 
             try {
@@ -325,16 +441,22 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    console.log('Latest readings:', result.Readings);
-                    
-                    // Display in a simple format
-                    const readingsText = result.Readings.map(r => 
-                        `${new Date(r.Timestamp).toLocaleString()}: ${r.Efficiency}% efficiency`
-                    ).join('\\n');
-                    
-                    alert(`Latest ${result.Count} readings:\\n\\n${readingsText}`);
+                    const readings = Array.isArray(result.readings) ? result.readings : [];
+                    console.log('Latest readings:', readings);
+
+                    if (readings.length === 0) {
+                        alert('No readings available yet.');
+                        return;
+                    }
+
+                    const readingsText = readings.map(r => 
+                        `${new Date(r.timestamp).toLocaleString()}: T1=${r.t1_Outdoor_Air_In_Temperature}°C T2=${r.t2_Supply_Air_Temperature}°C`
+                    ).join('\n');
+
+                    const count = typeof result.count === 'number' ? result.count : readings.length;
+                    alert(`Latest ${count} readings:\n\n${readingsText}`);
                 } else {
-                    alert(`Failed to get readings: ${result.Message}`);
+                    alert(`Failed to get readings: ${result.message || result.Message}`);
                     console.error('Get readings failed:', result);
                 }
             } catch (error) {

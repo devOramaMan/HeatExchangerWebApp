@@ -19,12 +19,10 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     CREATE TABLE IF NOT EXISTS monitoring.heat_exchanger_readings (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-        temperature_inlet DECIMAL(8,2),
-        temperature_outlet DECIMAL(8,2),
-        pressure_inlet DECIMAL(8,2),
-        pressure_outlet DECIMAL(8,2),
-        flow_rate DECIMAL(8,2),
-        efficiency DECIMAL(5,2),
+        t1_outdoor_air_in_temperature DECIMAL(8,2),
+        t2_supply_air_temperature DECIMAL(8,2),
+        t3_extract_air_temperature DECIMAL(8,2),
+        t4_exhaust_air_out_temperature DECIMAL(8,2),
         created_at TIMESTAMPTZ DEFAULT NOW(),
         updated_at TIMESTAMPTZ DEFAULT NOW()
     );
@@ -48,11 +46,11 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     
     -- Insert some sample data for development
     INSERT INTO monitoring.heat_exchanger_readings 
-        (temperature_inlet, temperature_outlet, pressure_inlet, pressure_outlet, flow_rate, efficiency)
+        (t1_outdoor_air_in_temperature, t2_supply_air_temperature, t3_extract_air_temperature, t4_exhaust_air_out_temperature)
     VALUES
-        (80.5, 65.2, 2.1, 1.8, 150.0, 85.3),
-        (82.1, 66.8, 2.2, 1.9, 148.5, 86.1),
-        (79.8, 64.5, 2.0, 1.7, 152.3, 84.8);
+        (5.0, 18.0, 20.0, 8.0),
+        (4.5, 17.5, 19.8, 7.8),
+        (5.5, 18.5, 20.2, 8.2);
     
     INSERT INTO historical.efficiency_history 
         (recorded_date, average_efficiency, max_efficiency, min_efficiency, sample_count)

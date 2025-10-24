@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace HeatExchangerWebApp.Services;
 
 public class DatabaseConnectionService
@@ -21,11 +23,18 @@ public class DatabaseConnectionService
         var password = Environment.GetEnvironmentVariable("PG_DB_PASSWORD");
 
         // Validate required parameters
-        if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(port) || 
-            string.IsNullOrEmpty(database) || string.IsNullOrEmpty(user) || 
-            string.IsNullOrEmpty(password))
+        var missingVars = new List<string>();
+
+        if (string.IsNullOrEmpty(host)) missingVars.Add("PG_DB_HOST");
+        if (string.IsNullOrEmpty(port)) missingVars.Add("PG_DB_PORT");
+        if (string.IsNullOrEmpty(database)) missingVars.Add("PG_DB_NAME");
+        if (string.IsNullOrEmpty(user)) missingVars.Add("PG_DB_USER");
+        if (string.IsNullOrEmpty(password)) missingVars.Add("PG_DB_PASSWORD");
+
+        if (missingVars.Count > 0)
         {
-            _logger.LogError("Missing required database environment variables");
+            _logger.LogError("Missing required database environment variables: {MissingVars}", string.Join(", ", missingVars));
+            _logger.LogInformation("Reminder: set the required PG_* environment variables before running the app (e.g. export PG_DB_HOST=localhost).");
             throw new InvalidOperationException("Database configuration is incomplete. Check environment variables.");
         }
 
