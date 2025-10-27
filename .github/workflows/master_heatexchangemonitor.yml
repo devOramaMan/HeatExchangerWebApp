@@ -18,10 +18,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.x'
+      - name: Setup .NET Core (Ubuntu APT)
+        run: |
+          # Check if .NET is already installed
+          if command -v dotnet &> /dev/null; then
+            echo ".NET is already installed:"
+            dotnet --version
+          else
+            echo "Installing .NET 9 for Ubuntu via APT..."
+            # Add Microsoft package repository
+            wget https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            rm packages-microsoft-prod.deb
+            
+            # Update package list and install .NET SDK
+            sudo apt-get update
+            sudo apt-get install -y dotnet-sdk-9.0
+            
+            # Verify installation
+            dotnet --version
+          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -73,6 +89,22 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_BE386F53E5214085B41B48594C5BD12E }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2C9100FA67C84AA59553DE2F00B61F11 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3B86BF46D7D64302BC78AFCE9DC4E2F9 }}
+
+      - name: Configure Azure Web App Settings
+        run: |
+          echo "Configuring Azure Web App application settings..."
+          az webapp config appsettings set \
+            --resource-group HeatExchangeDeploy \
+            --name HeatExchangeMonitor \
+            --settings \
+              PG_DB_HOST="${PG_DB_HOST}" \
+              PG_DB_PORT="${PG_DB_PORT}" \
+              PG_DB_NAME="${PG_DB_NAME}" \
+              PG_DB_USER="${PG_DB_USER}" \
+              PG_DB_PASSWORD="${PG_DB_PASSWORD}" \
+              AZURE_WEBPUBSUB_CONNECTION_STRING="${AZURE_WEBPUBSUB_CONNECTION_STRING}" \
+              AZURE_WEBPUBSUB_HUB_NAME="${AZURE_WEBPUBSUB_HUB_NAME}" \
+              ASPNETCORE_ENVIRONMENT="Production"
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
