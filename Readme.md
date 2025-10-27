@@ -9,6 +9,8 @@ Azure Web PubSub Service.
 - Npgsql (.net package)
 - Azure cli (az) 
 - Github cli (gh)
+- npm
+- nodejs
 
 # Azure Web PubSub Service
 To create an Azure Web PubSub Service named `HeatExchangerService`, use the following Azure CLI commands:
@@ -42,17 +44,14 @@ az webpubsub key show \
   --query primaryConnectionString \
   -o tsv
 
-# Set the connection string as environment variable or GitHub secret
+# Set the connection string as environment variable or GitHub secret (the whole response)
 export AZURE_WEBPUBSUB_CONNECTION_STRING="<connection-string-from-above>"
 
 # Or add it to GitHub secrets
-gh secret set AZURE_WEBPUBSUB_CONNECTION_STRING --body "<connection-string>" --repo devOramaMan/HeatExchangerWebApp
+gh secret set AZURE_WEBPUBSUB_CONNECTION_STRING --body $AZURE_WEBPUBSUB_CONNECTION_STRING --repo devOramaMan/HeatExchangerWebApp
 ```
 
-
 For more options and details, see the [Azure Web PubSub documentation](https://learn.microsoft.com/en-us/azure/azure-web-pubsub/).
-
-
 
 # Secrets
 
@@ -92,3 +91,9 @@ export AZURE_WEBPUBSUB_CONNECTION_STRING="<your-connection-string>"
 #fill inn ---
 export PG_DB_HOST=localhost && export PG_DB_PORT=5432 && export PG_DB_NAME=--- && export PG_DB_USER=--- && export PG_DB_PASSWORD=--- && export AZURE_WEBPUBSUB_CONNECTION_STRING=--- && dotnet build && dotnet run
 ```
+
+# Manual deploy
+
+The deploy is handled bye the yaml github actions when delivered to main.
+
+az webapp deploy --resource-group HeatExchangeDeploy --name HeatExchangeMonitor --src-path ./publish
