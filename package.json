@@ -4,13 +4,13 @@
   "description": "ASP.NET Core Heat Exchanger Web App with Azure Web PubSub, real-time temperature monitoring, and PostgreSQL integration.",
   "main": "wwwroot/js/index.js",
   "scripts": {
-    "build": "node scripts/build.js",
-    "clean": "node scripts/clean.js",
+    "build": "node Scripts/build.js",
+    "clean": "node Scripts/clean.js",
     "rebuild": "npm run clean && npm run build",
     "dev": "npm run build && dotnet run",
     "watch:build": "nodemon --watch node_modules --ext js,css --exec \"npm run build\"",
-    "publisher": "node scripts/publisher.js",
-    "subscriber": "node scripts/subscriber.js",
+    "publisher": "node Scripts/publisher.js",
+    "subscriber": "node Scripts/subscriber.js",
     "test:pubsub": "concurrently \"npm run subscriber\" \"npm run publisher\"",
     "postinstall": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/devOramaMan/HeatExchangerWebApp#readme",
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=20.0.0",
     "npm": ">=9.0.0"
   }
 }
