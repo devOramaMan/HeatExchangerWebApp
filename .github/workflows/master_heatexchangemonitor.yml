@@ -59,13 +59,16 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o $HOME/myapp
+        run: dotnet publish -c Release -o ~/myapp
+
+      - name: Upload artifact info
+        run: echo "Uploading artifact to ${{ env.HOME }}/myapp"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{ env.HOME }}/myapp
+          path: ~/myapp
 
   deploy:
     runs-on: self-hosted
