@@ -374,3 +374,4 @@ secrets.json
 
 # Node.js build output
 wwwroot/dist/
+publish.zip
