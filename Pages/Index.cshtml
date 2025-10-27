@@ -81,10 +81,12 @@
                     <input type="radio" name="dataSource" value="Simulator" asp-for="@Model.DataSource" /> Simulator Only
                 </label>
                 <br />
+                <!--
                 <label>
                     <input type="radio" name="dataSource" value="PostGres" asp-for="@Model.DataSource" /> PostGres Database
                 </label>
                 <br />
+                -->
                 <label>
                     <input type="radio" name="dataSource" value="AzureWebPubSub" checked asp-for="@Model.DataSource" /> Azure Web Pub Sub
                 </label>
@@ -98,14 +100,14 @@
         <canvas id="efficiencyChart" width="800" height="300"></canvas>
     </div>
 
-    <!-- Database Status -->
+    <!-- Database Status 
     <div class="database-status">
         <h4>Database Connection Status</h4>
         <div id="dbStatus" class="status-indicator">Checking...</div>
         <button onclick="testDatabaseConnection()" class="btn btn-primary">Test Connection</button>
         <button onclick="insertTestData()" class="btn btn-success">Insert Test Data</button>
         <button onclick="getLatestReadings()" class="btn btn-info">Get Latest Readings</button>
-    </div>
+    </div>-->
 
     <!-- Terminology -->
     <div class="terminology">
