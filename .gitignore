@@ -370,3 +370,7 @@ FodyWeavers.xsd
 .devcontainer/CODESPACES-GUIDE.md
 .devcontainer/.env.example
 REBUILD_GUIDE.md
+secrets.json
+
+# Node.js build output
+wwwroot/dist/

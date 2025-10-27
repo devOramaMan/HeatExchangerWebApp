@@ -11,11 +11,13 @@ public class DatabaseTestController : ControllerBase
 {
     private readonly DatabaseConnectionService _connectionService;
     private readonly ILogger<DatabaseTestController> _logger;
+    private readonly IConfiguration _configuration;
 
-    public DatabaseTestController(DatabaseConnectionService connectionService, ILogger<DatabaseTestController> logger)
+    public DatabaseTestController(DatabaseConnectionService connectionService, ILogger<DatabaseTestController> logger, IConfiguration configuration)
     {
         _connectionService = connectionService;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [HttpGet("info")]
@@ -27,12 +29,12 @@ public class DatabaseTestController : ControllerBase
             
             var info = new
             {
-                Host = Environment.GetEnvironmentVariable("PG_DB_HOST"),
-                Port = Environment.GetEnvironmentVariable("PG_DB_PORT"),
-                Database = Environment.GetEnvironmentVariable("PG_DB_NAME"),
-                User = Environment.GetEnvironmentVariable("PG_DB_USER"),
-                IsCodespaces = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CODESPACES")),
-                CodespaceName = Environment.GetEnvironmentVariable("CODESPACE_NAME"),
+                Host = _configuration["PG_DB_HOST"],
+                Port = _configuration["PG_DB_PORT"],
+                Database = _configuration["PG_DB_NAME"],
+                User = _configuration["PG_DB_USER"],
+                IsCodespaces = !string.IsNullOrEmpty(_configuration["CODESPACES"]),
+                CodespaceName = _configuration["CODESPACE_NAME"],
                 InternalConnectionString = _connectionService.GetInternalConnectionString(),
                 ExternalConnectionString = GetSafeExternalConnectionString()
             };
@@ -193,7 +195,12 @@ public class DatabaseTestController : ControllerBase
 
     private string MaskPassword(string connectionString)
     {
-        return connectionString.Replace(Environment.GetEnvironmentVariable("PG_DB_PASSWORD") ?? "", "****");
+        var password = _configuration["PG_DB_PASSWORD"];
+        if (!string.IsNullOrEmpty(password))
+        {
+            return connectionString.Replace(password, "****");
+        }
+        return connectionString;
     }
 
     private string GetSafeExternalConnectionString()

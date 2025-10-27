@@ -34,6 +34,19 @@ az webpubsub create \
   --resource-group HeatExchangerRG \
   --location westeurope \
   --sku Free_F1
+
+# Get the connection string
+az webpubsub key show \
+  --name HeatExchangerService \
+  --resource-group HeatExchangerRG \
+  --query primaryConnectionString \
+  -o tsv
+
+# Set the connection string as environment variable or GitHub secret
+export AZURE_WEBPUBSUB_CONNECTION_STRING="<connection-string-from-above>"
+
+# Or add it to GitHub secrets
+gh secret set AZURE_WEBPUBSUB_CONNECTION_STRING --body "<connection-string>" --repo devOramaMan/HeatExchangerWebApp
 ```
 
 
@@ -52,7 +65,7 @@ gh auth login
 # list
 gh secret list --repo <Github user>/HeatExchangerWebApp
 
-# set 
+# set PostgreSQL secrets
 # PG_DB_HOST
 # PG_DB_NAME
 # PG_DB_PASSWORD
@@ -60,17 +73,22 @@ gh secret list --repo <Github user>/HeatExchangerWebApp
 # PG_DB_USER
 gh secret set PG_DB_PASSWORD --body "your_secret_value" --repo owner/repo-name
 
+# set Azure Web PubSub connection string
+# AZURE_WEBPUBSUB_CONNECTION_STRING
+gh secret set AZURE_WEBPUBSUB_CONNECTION_STRING --body "<connection-string>" --repo owner/repo-name
+
 #For local testing export in terminal where the program is started
 export PG_DB_HOST="host"
 export PG_DB_NAME="name"
 export PG_DB_PASSWORD="your_secret_value"
 export PG_DB_PORT=5232
 export PG_DB_USER="user"
+export AZURE_WEBPUBSUB_CONNECTION_STRING="<your-connection-string>"
 ```
 
 # local run
 
 ```bash
 #fill inn ---
-export PG_DB_HOST=localhost && export PG_DB_PORT=5432 && export PG_DB_NAME=--- && export PG_DB_USER=--- && export PG_DB_PASSWORD=--- && dotnet build && dotnet run
+export PG_DB_HOST=localhost && export PG_DB_PORT=5432 && export PG_DB_NAME=--- && export PG_DB_USER=--- && export PG_DB_PASSWORD=--- && export AZURE_WEBPUBSUB_CONNECTION_STRING=--- && dotnet build && dotnet run
 ```

@@ -15,12 +15,12 @@ public class DatabaseConnectionService
 
     public string GetConnectionString()
     {
-        // Get database parameters from environment variables (injected from GitHub secrets)
-        var host = Environment.GetEnvironmentVariable("PG_DB_HOST");
-        var port = Environment.GetEnvironmentVariable("PG_DB_PORT");
-        var database = Environment.GetEnvironmentVariable("PG_DB_NAME");
-        var user = Environment.GetEnvironmentVariable("PG_DB_USER");
-        var password = Environment.GetEnvironmentVariable("PG_DB_PASSWORD");
+        // Get database parameters from configuration (secrets.json or environment variables)
+        var host = _configuration["PG_DB_HOST"];
+        var port = _configuration["PG_DB_PORT"];
+        var database = _configuration["PG_DB_NAME"];
+        var user = _configuration["PG_DB_USER"];
+        var password = _configuration["PG_DB_PASSWORD"];
 
         // Validate required parameters
         var missingVars = new List<string>();
@@ -33,14 +33,14 @@ public class DatabaseConnectionService
 
         if (missingVars.Count > 0)
         {
-            _logger.LogError("Missing required database environment variables: {MissingVars}", string.Join(", ", missingVars));
-            _logger.LogInformation("Reminder: set the required PG_* environment variables before running the app (e.g. export PG_DB_HOST=localhost).");
-            throw new InvalidOperationException("Database configuration is incomplete. Check environment variables.");
+            _logger.LogError("Missing required database configuration: {MissingVars}", string.Join(", ", missingVars));
+            _logger.LogInformation("Reminder: set the required PG_* values in secrets.json or environment variables.");
+            throw new InvalidOperationException("Database configuration is incomplete. Check configuration.");
         }
 
         // Determine if we're in Codespaces and need external access
-        var isCodespaces = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CODESPACES"));
-        var codespaceName = Environment.GetEnvironmentVariable("CODESPACE_NAME");
+        var isCodespaces = !string.IsNullOrEmpty(_configuration["CODESPACES"]);
+        var codespaceName = _configuration["CODESPACE_NAME"];
 
         if (isCodespaces && !string.IsNullOrEmpty(codespaceName))
         {
@@ -60,22 +60,22 @@ public class DatabaseConnectionService
 
     public string GetInternalConnectionString()
     {
-        var host = Environment.GetEnvironmentVariable("PG_DB_HOST");
-        var port = Environment.GetEnvironmentVariable("PG_DB_PORT");
-        var database = Environment.GetEnvironmentVariable("PG_DB_NAME");
-        var user = Environment.GetEnvironmentVariable("PG_DB_USER");
-        var password = Environment.GetEnvironmentVariable("PG_DB_PASSWORD");
+        var host = _configuration["PG_DB_HOST"];
+        var port = _configuration["PG_DB_PORT"];
+        var database = _configuration["PG_DB_NAME"];
+        var user = _configuration["PG_DB_USER"];
+        var password = _configuration["PG_DB_PASSWORD"];
 
         return $"Server={host};Database={database};Port={port};User Id={user};Password={password};Include Error Detail=true;";
     }
 
     public string GetExternalConnectionString()
     {
-        var port = Environment.GetEnvironmentVariable("PG_DB_PORT");
-        var database = Environment.GetEnvironmentVariable("PG_DB_NAME");
-        var user = Environment.GetEnvironmentVariable("PG_DB_USER");
-        var password = Environment.GetEnvironmentVariable("PG_DB_PASSWORD");
-        var codespaceName = Environment.GetEnvironmentVariable("CODESPACE_NAME");
+        var port = _configuration["PG_DB_PORT"];
+        var database = _configuration["PG_DB_NAME"];
+        var user = _configuration["PG_DB_USER"];
+        var password = _configuration["PG_DB_PASSWORD"];
+        var codespaceName = _configuration["CODESPACE_NAME"];
 
         if (string.IsNullOrEmpty(codespaceName))
         {
@@ -87,12 +87,12 @@ public class DatabaseConnectionService
 
     public void LogConnectionInfo()
     {
-        var host = Environment.GetEnvironmentVariable("PG_DB_HOST");
-        var port = Environment.GetEnvironmentVariable("PG_DB_PORT");
-        var database = Environment.GetEnvironmentVariable("PG_DB_NAME");
-        var user = Environment.GetEnvironmentVariable("PG_DB_USER");
-        var isCodespaces = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CODESPACES"));
-        var codespaceName = Environment.GetEnvironmentVariable("CODESPACE_NAME");
+        var host = _configuration["PG_DB_HOST"];
+        var port = _configuration["PG_DB_PORT"];
+        var database = _configuration["PG_DB_NAME"];
+        var user = _configuration["PG_DB_USER"];
+        var isCodespaces = !string.IsNullOrEmpty(_configuration["CODESPACES"]);
+        var codespaceName = _configuration["CODESPACE_NAME"];
 
         _logger.LogInformation("=== Database Connection Info ===");
         _logger.LogInformation("Host: {Host}", host);
