@@ -11,11 +11,13 @@ public class DatabaseTestController : ControllerBase
 {
     private readonly DatabaseConnectionService _connectionService;
     private readonly ILogger<DatabaseTestController> _logger;
+    private readonly IConfiguration _configuration;
 
-    public DatabaseTestController(DatabaseConnectionService connectionService, ILogger<DatabaseTestController> logger)
+    public DatabaseTestController(DatabaseConnectionService connectionService, ILogger<DatabaseTestController> logger, IConfiguration configuration)
     {
         _connectionService = connectionService;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [HttpGet("info")]
@@ -27,12 +29,12 @@ public class DatabaseTestController : ControllerBase
             
             var info = new
             {
-                Host = Environment.GetEnvironmentVariable("PG_DB_HOST"),
-                Port = Environment.GetEnvironmentVariable("PG_DB_PORT"),
-                Database = Environment.GetEnvironmentVariable("PG_DB_NAME"),
-                User = Environment.GetEnvironmentVariable("PG_DB_USER"),
-                IsCodespaces = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CODESPACES")),
-                CodespaceName = Environment.GetEnvironmentVariable("CODESPACE_NAME"),
+                Host = _configuration["PG_DB_HOST"],
+                Port = _configuration["PG_DB_PORT"],
+                Database = _configuration["PG_DB_NAME"],
+                User = _configuration["PG_DB_USER"],
+                IsCodespaces = !string.IsNullOrEmpty(_configuration["CODESPACES"]),
+                CodespaceName = _configuration["CODESPACE_NAME"],
                 InternalConnectionString = _connectionService.GetInternalConnectionString(),
                 ExternalConnectionString = GetSafeExternalConnectionString()
             };
@@ -104,17 +106,15 @@ public class DatabaseTestController : ControllerBase
             
             var sql = @"
                 INSERT INTO monitoring.heat_exchanger_readings 
-                (temperature_inlet, temperature_outlet, pressure_inlet, pressure_outlet, flow_rate, efficiency) 
-                VALUES (@temp_in, @temp_out, @press_in, @press_out, @flow, @eff)
+                (t1_outdoor_air_in_temperature, t2_supply_air_temperature, t3_extract_air_temperature, t4_exhaust_air_out_temperature) 
+                VALUES (@t1, @t2, @t3, @t4)
                 RETURNING id, timestamp;";
             
             using var command = new NpgsqlCommand(sql, connection);
-            command.Parameters.AddWithValue("@temp_in", reading.TemperatureInlet);
-            command.Parameters.AddWithValue("@temp_out", reading.TemperatureOutlet);
-            command.Parameters.AddWithValue("@press_in", reading.PressureInlet);
-            command.Parameters.AddWithValue("@press_out", reading.PressureOutlet);
-            command.Parameters.AddWithValue("@flow", reading.FlowRate);
-            command.Parameters.AddWithValue("@eff", reading.Efficiency);
+            command.Parameters.AddWithValue("@t1", reading.T1_Outdoor_Air_In_Temperature);
+            command.Parameters.AddWithValue("@t2", reading.T2_Supply_Air_Temperature);
+            command.Parameters.AddWithValue("@t3", reading.T3_Extract_Air_Temperature);
+            command.Parameters.AddWithValue("@t4", reading.T4_Exhaust_Air_Out_Temperature);
             
             using var reader = await command.ExecuteReaderAsync();
             await reader.ReadAsync();
@@ -152,8 +152,11 @@ public class DatabaseTestController : ControllerBase
             await connection.OpenAsync();
             
             var sql = @"
-                SELECT id, timestamp, temperature_inlet, temperature_outlet, 
-                       pressure_inlet, pressure_outlet, flow_rate, efficiency
+                SELECT id, timestamp, 
+                       t1_outdoor_air_in_temperature, 
+                       t2_supply_air_temperature, 
+                       t3_extract_air_temperature, 
+                       t4_exhaust_air_out_temperature
                 FROM monitoring.heat_exchanger_readings 
                 ORDER BY timestamp DESC 
                 LIMIT 10;";
@@ -168,12 +171,10 @@ public class DatabaseTestController : ControllerBase
                 {
                     Id = reader.GetGuid(0),
                     Timestamp = reader.GetDateTime(1),
-                    TemperatureInlet = reader.GetDecimal(2),
-                    TemperatureOutlet = reader.GetDecimal(3),
-                    PressureInlet = reader.GetDecimal(4),
-                    PressureOutlet = reader.GetDecimal(5),
-                    FlowRate = reader.GetDecimal(6),
-                    Efficiency = reader.GetDecimal(7)
+                    T1_Outdoor_Air_In_Temperature = reader.GetDecimal(2),
+                    T2_Supply_Air_Temperature = reader.GetDecimal(3),
+                    T3_Extract_Air_Temperature = reader.GetDecimal(4),
+                    T4_Exhaust_Air_Out_Temperature = reader.GetDecimal(5)
                 });
             }
             
@@ -194,7 +195,12 @@ public class DatabaseTestController : ControllerBase
 
     private string MaskPassword(string connectionString)
     {
-        return connectionString.Replace(Environment.GetEnvironmentVariable("PG_DB_PASSWORD") ?? "", "****");
+        var password = _configuration["PG_DB_PASSWORD"];
+        if (!string.IsNullOrEmpty(password))
+        {
+            return connectionString.Replace(password, "****");
+        }
+        return connectionString;
     }
 
     private string GetSafeExternalConnectionString()
@@ -212,10 +218,8 @@ public class DatabaseTestController : ControllerBase
 
 public class TestReading
 {
-    public decimal TemperatureInlet { get; set; }
-    public decimal TemperatureOutlet { get; set; }
-    public decimal PressureInlet { get; set; }
-    public decimal PressureOutlet { get; set; }
-    public decimal FlowRate { get; set; }
-    public decimal Efficiency { get; set; }
+    public decimal T1_Outdoor_Air_In_Temperature { get; set; }
+    public decimal T2_Supply_Air_Temperature { get; set; }
+    public decimal T3_Extract_Air_Temperature { get; set; }
+    public decimal T4_Exhaust_Air_Out_Temperature { get; set; }
 }

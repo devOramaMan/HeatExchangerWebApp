@@ -1,0 +1,52 @@
+{
+  "name": "heatexchangerwebapp",
+  "version": "1.0.0",
+  "description": "ASP.NET Core Heat Exchanger Web App with Azure Web PubSub, real-time temperature monitoring, and PostgreSQL integration.",
+  "main": "wwwroot/js/index.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "clean": "node scripts/clean.js",
+    "rebuild": "npm run clean && npm run build",
+    "dev": "npm run build && dotnet run",
+    "watch:build": "nodemon --watch node_modules --ext js,css --exec \"npm run build\"",
+    "publisher": "node scripts/publisher.js",
+    "subscriber": "node scripts/subscriber.js",
+    "test:pubsub": "concurrently \"npm run subscriber\" \"npm run publisher\"",
+    "postinstall": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@azure/web-pubsub": "^1.2.0",
+    "@azure/web-pubsub-client": "^1.0.2",
+    "chart.js": "^4.4.0",
+    "bootstrap": "^5.3.2",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devOramaMan/HeatExchangerWebApp.git"
+  },
+  "keywords": [
+    "asp.net-core",
+    "azure",
+    "webpubsub",
+    "realtime",
+    "temperature-monitoring",
+    "heat-exchanger"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devOramaMan/HeatExchangerWebApp/issues"
+  },
+  "homepage": "https://github.com/devOramaMan/HeatExchangerWebApp#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

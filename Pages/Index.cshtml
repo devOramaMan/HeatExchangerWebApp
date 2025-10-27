@@ -72,6 +72,27 @@
         </div>
     </div>
 
+    <!-- Data Source Toggle -->
+    <div class="core-controls">
+        <h4>Data Source</h4>
+        <div class="control-group">
+            <form id="dataSourceForm">
+                <label>
+                    <input type="radio" name="dataSource" value="Simulator" asp-for="@Model.DataSource" /> Simulator Only
+                </label>
+                <br />
+                <label>
+                    <input type="radio" name="dataSource" value="PostGres" asp-for="@Model.DataSource" /> PostGres Database
+                </label>
+                <br />
+                <label>
+                    <input type="radio" name="dataSource" value="AzureWebPubSub" checked asp-for="@Model.DataSource" /> Azure Web Pub Sub
+                </label>
+            </form>
+            <div id="dataSourceStatus" class="data-source-status">Mode: Azure Web PubSub - Initializing...</div>
+        </div>
+    </div>
+
     <!-- Efficiency chart -->
     <div class="chart-container">
         <canvas id="efficiencyChart" width="800" height="300"></canvas>
@@ -96,254 +117,11 @@
             <li><strong>T3:</strong> Extract Air      - Air from indoor spaces that is being expelled to the ventilation unit</li>
             <li><strong>T4:</strong> Exhaust Air Out  - Air expelled from the ventilation unit to the outside</li>
         </ul>
+        </ul>
     </div>
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Efficiency calculation
-        function calculateEfficiency() {
-            const t1 = currentData.temp1; // T1: Outdoor Air In (Chamber 4)
-            const t2 = currentData.temp2; // T2: Supply Air (Chamber 1)
-            const t3 = currentData.temp3; // T3: Extract Air (Chamber 3)
-            const t4 = currentData.temp4; // T4: Exhaust Air Out (Chamber 2)
-            
-            // Efficiency = (T2-T1)/(T3-T1) * 100
-            if (t3 !== t1) {
-                const efficiency = ((t2 - t1) / (t3 - t1)) * 100;
-                return Math.max(0, Math.min(100, efficiency)); // Limit between 0-100%
-            }
-            return 0;
-        }
-        
-        function updateEfficiency() {
-            const efficiency = calculateEfficiency();
-            document.getElementById('efficiencyValue').textContent = efficiency.toFixed(1) + '%';
-            
-            // Update chart
-            updateChart(efficiency);
-        }
-
-        // Hardcoded data simulating data source fetch
-        let currentData = {
-            temp1: 5.0,   // T1: Outdoor Air In (Chamber 4)
-            temp2: 18.0,  // T2: Supply Air (Chamber 1) 
-            temp3: 20.0,  // T3: Extract Air (Chamber 3)
-            temp4: 8.0    // T4: Exhaust Air Out (Chamber 2)
-        };
-
-        // Simulates fetching data from API/database
-        function fetchTemperatureData() {
-            // Hardcoded values with some variation to simulate live data
-            const baseValues = {
-                temp1: 5.0,
-                temp2: 18.0,
-                temp3: 20.0,
-                temp4: 8.0
-            };
-
-            // Add some random variation (±2 degrees)
-            currentData.temp1 = baseValues.temp1 + (Math.random() - 0.5) * 4;
-            currentData.temp2 = baseValues.temp2 + (Math.random() - 0.5) * 4;
-            currentData.temp3 = baseValues.temp3 + (Math.random() - 0.5) * 4;
-            currentData.temp4 = baseValues.temp4 + (Math.random() - 0.5) * 4;
-
-            // Update display
-            updateTemperatureDisplay();
-        }
-
-        function updateTemperatureDisplay() {
-            // Map temperature data to correct chamber positions
-            document.getElementById('temp1').textContent = currentData.temp1.toFixed(1); // T1: Outdoor Air In (Chamber 4)
-            document.getElementById('temp2').textContent = currentData.temp2.toFixed(1); // T2: Supply Air (Chamber 1)
-            document.getElementById('temp3').textContent = currentData.temp3.toFixed(1); // T3: Extract Air (Chamber 3)
-            document.getElementById('temp4').textContent = currentData.temp4.toFixed(1); // T4: Exhaust Air Out (Chamber 2)
-        }
-        
-        // Chart setup
-        let chartData = {
-            labels: [],
-            datasets: [{
-                label: 'Efficiency (%)',
-                data: [],
-                borderColor: 'rgb(75, 192, 192)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                tension: 0.1
-            }]
-        };
-        
-        const ctx = document.getElementById('efficiencyChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        title: {
-                            display: true,
-                            text: 'Efficiency (%)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Time'
-                        }
-                    }
-                },
-                plugins: {
-                    title: {
-                        display: false,
-                        text: 'Heat Exchanger Efficiency'
-                    }
-                }
-            }
-        });
-        
-        function updateChart(efficiency) {
-            const now = new Date().toLocaleTimeString();
-            chartData.labels.push(now);
-            chartData.datasets[0].data.push(efficiency);
-            
-            // Keep only the last 20 data points
-            if (chartData.labels.length > 20) {
-                chartData.labels.shift();
-                chartData.datasets[0].data.shift();
-            }
-            
-            chart.update();
-        }
-        
-        // Core rotation control
-        const coreElement = document.querySelector('.heat-exchanger-core');
-        const rotationToggle = document.getElementById('rotationToggle');
-        const rpmSlider = document.getElementById('rpmSlider');
-        const rpmValue = document.getElementById('rpmValue');
-
-        function updateRotation() {
-            if (rotationToggle.checked) {
-                const rpm = parseInt(rpmSlider.value);
-                const rotationDuration = 60 / rpm; // Convert RPM to seconds per rotation
-                
-                coreElement.style.setProperty('--rotation-duration', rotationDuration + 's');
-                coreElement.classList.add('rotating');
-                
-                // Update RPM display
-                rpmValue.textContent = rpm;
-            } else {
-                coreElement.classList.remove('rotating');
-            }
-        }
-
-        // Event listeners for rotation controls
-        rotationToggle.addEventListener('change', updateRotation);
-        rpmSlider.addEventListener('input', () => {
-            rpmValue.textContent = rpmSlider.value;
-            if (rotationToggle.checked) {
-                updateRotation();
-            }
-        });
-
-        // Initial data load
-        fetchTemperatureData();
-        updateEfficiency();
-        
-        // Simulate data fetching every 3 seconds (as if coming from sensors/API)
-        setInterval(() => {
-            fetchTemperatureData();
-            updateEfficiency();
-        }, 3000);
-
-        // Database testing functions
-        async function testDatabaseConnection() {
-            const statusElement = document.getElementById('dbStatus');
-            statusElement.textContent = 'Testing connection...';
-            statusElement.className = 'status-indicator testing';
-            
-            try {
-                const response = await fetch('/api/DatabaseTest/test-connection');
-                const result = await response.json();
-                
-                if (response.ok) {
-                    statusElement.textContent = `Connected - ${result.DatabaseInfo?.Database || 'Unknown DB'}`;
-                    statusElement.className = 'status-indicator success';
-                    console.log('Database Info:', result);
-                } else {
-                    statusElement.textContent = `Failed - ${result.Message}`;
-                    statusElement.className = 'status-indicator error';
-                    console.error('Connection failed:', result);
-                }
-            } catch (error) {
-                statusElement.textContent = `Error - ${error.message}`;
-                statusElement.className = 'status-indicator error';
-                console.error('Network error:', error);
-            }
-        }
-
-        async function insertTestData() {
-            const testData = {
-                TemperatureInlet: currentData.temp1,
-                TemperatureOutlet: currentData.temp2,
-                PressureInlet: 2.1,
-                PressureOutlet: 1.8,
-                FlowRate: 150.0,
-                Efficiency: calculateEfficiency()
-            };
-
-            try {
-                const response = await fetch('/api/DatabaseTest/insert-test', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(testData)
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    alert(`Data inserted successfully! ID: ${result.Result?.Id}`);
-                    console.log('Inserted data:', result);
-                } else {
-                    alert(`Insert failed: ${result.Message}`);
-                    console.error('Insert failed:', result);
-                }
-            } catch (error) {
-                alert(`Error: ${error.message}`);
-                console.error('Network error:', error);
-            }
-        }
-
-        async function getLatestReadings() {
-            try {
-                const response = await fetch('/api/DatabaseTest/readings');
-                const result = await response.json();
-                
-                if (response.ok) {
-                    console.log('Latest readings:', result.Readings);
-                    
-                    // Display in a simple format
-                    const readingsText = result.Readings.map(r => 
-                        `${new Date(r.Timestamp).toLocaleString()}: ${r.Efficiency}% efficiency`
-                    ).join('\\n');
-                    
-                    alert(`Latest ${result.Count} readings:\\n\\n${readingsText}`);
-                } else {
-                    alert(`Failed to get readings: ${result.Message}`);
-                    console.error('Get readings failed:', result);
-                }
-            } catch (error) {
-                alert(`Error: ${error.message}`);
-                console.error('Network error:', error);
-            }
-        }
-
-        // Test database connection on page load
-        setTimeout(testDatabaseConnection, 1000);
-    </script>
+    <script src="~/dist/js/chart.umd.js"></script>
+    <script src="~/js/index.js"></script>
 }
