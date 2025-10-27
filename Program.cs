@@ -3,7 +3,11 @@ using HeatExchangerWebApp.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 //Add Configuration
-builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true).AddEnvironmentVariables();
+if (File.Exists("secrets.json"))
+{
+    builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
+}
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
