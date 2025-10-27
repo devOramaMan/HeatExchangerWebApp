@@ -21,7 +21,7 @@ jobs:
       - name: Setup dependencies
         run: |
           # Check if .NET is already installed
-          if command -v dotnet >/dev/null && command -v node >/dev/null && command -v npm >/dev/null; then
+          if command -v dotnet >/dev/null && command -v node >/dev/null && command -v npm >/dev/null && command -v az >/dev/null; then
             echo dependencies are already installed:
             echo ".Net version:"
             dotnet --version
@@ -29,6 +29,8 @@ jobs:
             node -v
             echo "npm version:"
             npm -v
+            echo "Azure CLI version:"
+            az --version
           else
             echo "Installing .NET 9 for Ubuntu via APT..."
             # Add Microsoft package repository
@@ -36,9 +38,15 @@ jobs:
             sudo dpkg -i packages-microsoft-prod.deb
             rm packages-microsoft-prod.deb
             
-            # Update package list and install .NET SDK
+            # Update package list and install dependencies
             sudo apt-get update
-            sudo apt-get install -y dotnet-sdk-9.0 nodejs npm
+            sudo apt-get install apt-transport-https ca-certificates curl gnupg lsb-release
+            curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/keyrings/microsoft.gpg > /dev/null
+            AZ_REPO=$(lsb_release -cs)
+            echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+
+            sudo apt-get update
+            sudo apt-get install -y dotnet-sdk-9.0 nodejs npm azure-cli
             
             # Verify installation
             dotnet --version
