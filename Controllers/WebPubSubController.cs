@@ -25,16 +25,26 @@ public class WebPubSubController : ControllerBase
             var connectionString = Environment.GetEnvironmentVariable("AZURE_WEBPUBSUB_CONNECTION_STRING")
                                 ?? _configuration["AZURE_WEBPUBSUB_CONNECTION_STRING"];
 
-            var hubName = Environment.GetEnvironmentVariable("AZURE_WEBPUBSUB_HUB_NAME")
-                          ?? _configuration["AZURE_WEBPUBSUB_HUB_NAME"];
-
-            if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(hubName))
+            if (string.IsNullOrEmpty(connectionString) )
             {
                 _logger.LogWarning("Azure Web PubSub connection string not configured");
                 return BadRequest(new
                 {
                     Status = "Error",
                     Message = "Azure Web PubSub connection string not configured. Set AZURE_WEBPUBSUB_CONNECTION_STRING environment variable."
+                });
+            }
+
+            var hubName = Environment.GetEnvironmentVariable("AZURE_WEBPUBSUB_HUB_NAME")
+                          ?? _configuration["AZURE_WEBPUBSUB_HUB_NAME"];
+
+            if (string.IsNullOrEmpty(hubName))
+            {
+                _logger.LogWarning("Azure Web PubSub hub name not configured");
+                return BadRequest(new
+                {
+                    Status = "Error",
+                    Message = "Azure Web PubSub hub name not configured. Set AZURE_WEBPUBSUB_HUB_NAME environment variable."
                 });
             }
 
