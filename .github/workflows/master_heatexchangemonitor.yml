@@ -18,12 +18,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET Core (Ubuntu APT)
+      - name: Setup dependencies
         run: |
           # Check if .NET is already installed
-          if command -v dotnet &> /dev/null; then
-            echo ".NET is already installed:"
+          if command -v dotnet >/dev/null && command -v node >/dev/null && command -v npm >/dev/null; then
+            echo dependencies are already installed:
+            echo ".Net version:"
             dotnet --version
+            echo "Node.js version:"
+            node -v
+            echo "npm version:"
+            npm -v
           else
             echo "Installing .NET 9 for Ubuntu via APT..."
             # Add Microsoft package repository
@@ -33,7 +38,7 @@ jobs:
             
             # Update package list and install .NET SDK
             sudo apt-get update
-            sudo apt-get install -y dotnet-sdk-9.0
+            sudo apt-get install -y dotnet-sdk-9.0 nodejs npm
             
             # Verify installation
             dotnet --version
